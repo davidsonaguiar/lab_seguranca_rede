@@ -51,14 +51,16 @@ Adote como princípio:
 
 Implemente, no mínimo, a seguinte política:
 
+
 | Comunicação | Política |
-| --- | --- | --- |
+| --- | --- |
 | LAN → Internet | ✅ Permitir |
 | LAN → Web/DNS da DMZ | ✅ Permitir |
 | Internet → Web da DMZ | ✅ Permitir |
 | Internet → LAN | ❌ Bloquear |
 | DMZ → LAN (novas conexões) | ❌ Bloquear |
-|Respostas de conexões permitidas | ✅ Permitir |
+| Respostas de conexões permitidas | ✅ Permitir |
+
 
 Sempre que apropriado, utilize filtragem stateful para diferenciar novas conexões das respostas pertencentes a conexões já estabelecidas.
 
