@@ -1,0 +1,16 @@
+# Firewall (Rede D)
+ifconfig eth0 198.51.100.2/30 up
+
+# Interface virtual simulando um destino na Internet pública (ex: Google DNS 8.8.8.8)
+ifconfig lo:1 8.8.8.8 netmask 255.255.255.255 up
+
+# Habilita encaminhamento de pacotes IPv4
+sysctl -w net.ipv4.ip_forward=1
+
+# Rotas de retorno para as sub-redes internas via Firewall (198.51.100.1)
+route add -net 10.0.1.0/24 gw 198.51.100.1
+route add -net 10.0.2.0/24 gw 198.51.100.1
+route add -net 10.0.3.0/24 gw 198.51.100.1
+
+# NAT (Masquerade) para acesso a destinos externos via interface de uplink (eth1)
+iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE
