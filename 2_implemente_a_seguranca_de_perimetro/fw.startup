@@ -1,0 +1,52 @@
+# WAN (Rede D)
+ifconfig eth0 198.51.100.1/30 up
+
+# LAN (Rede A)
+ifconfig eth1 10.0.1.1/24 up
+
+# DMZ (Rede B)
+ifconfig eth2 10.0.2.1/24 up
+
+# MGMT (Rede C)
+ifconfig eth3 10.0.3.1/24 up
+
+# Habilita encaminhamento de pacotes IPv4
+echo 1 > /proc/sys/net/ipv4/ip_forward 2>/dev/null || true
+
+# Gateway padrao apontando para r0
+route add default gw 198.51.100.2
+
+
+# -------------------------------
+# Firewall de perímetro - default deny
+# -------------------------------
+
+# Limpa regras antigas
+iptables -F
+iptables -X
+iptables -t nat -F
+
+# Política padrão para tráfego encaminhado
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT DROP
+
+# Permite respostas para conexões já autorizadas
+iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+# 1. LAN → Internet (Permitir navegação saindo da LAN via eth1 para a WAN eth0)
+iptables -A FORWARD -i eth1 -o eth0 -j ACCEPT
+
+# 2. LAN → Web (HTTP/HTTPS) e DNS na DMZ
+iptables -A FORWARD -i eth1 -o eth2 -d 10.0.2.10 -p tcp --dport 80 -j ACCEPT
+iptables -A FORWARD -i eth1 -o eth2 -d 10.0.2.10 -p tcp --dport 443 -j ACCEPT
+iptables -A FORWARD -i eth1 -o eth2 -d 10.0.2.11 -p udp --dport 53 -j ACCEPT
+iptables -A FORWARD -i eth1 -o eth2 -d 10.0.2.11 -p tcp --dport 53 -j ACCEPT
+
+# 3. Internet → Web da DMZ (Permitir tráfego externo para o servidor HTTP/HTTPS)
+iptables -A FORWARD -i eth0 -o eth2 -d 10.0.2.10 -p tcp --dport 80 -j ACCEPT
+iptables -A FORWARD -i eth0 -o eth2 -d 10.0.2.10 -p tcp --dport 443 -j ACCEPT
+
+# 4. Gerenciamento (Opcional - Acesso da estação adm para administração do firewall/redes)
+iptables -A INPUT -i eth3 -j ACCEPT
+iptables -A FORWARD -i eth3 -j ACCEPT

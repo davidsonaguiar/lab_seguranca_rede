@@ -1,0 +1,8 @@
+ifconfig eth0 10.0.2.11/24 up
+route add default gw 10.0.2.1
+
+# Mapeia portal.dmz para o IP do web server
+echo "10.0.2.10 portal.dmz" >> /etc/hosts
+
+# Sobe o dnsmasq escutando na porta 53
+dnsmasq --no-daemon &
