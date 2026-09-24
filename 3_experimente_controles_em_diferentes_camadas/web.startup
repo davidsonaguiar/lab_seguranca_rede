@@ -1,0 +1,15 @@
+ifconfig eth0 10.0.2.10/24 up
+route add default gw 10.0.2.1
+
+# Cria pagina inicial e inicia o serviço Web
+mkdir -p /var/www/html
+cat <<EOF > /var/www/html/index.html
+<!DOCTYPE html>
+<html>
+<head><title>DMZ Portal</title></head>
+<body><h1>DMZ Web Server Operacional</h1></body>
+</html>
+EOF
+
+# Inicia serviço HTTP (em segundo plano)
+python3 -m http.server 80 --directory /var/www/html &
