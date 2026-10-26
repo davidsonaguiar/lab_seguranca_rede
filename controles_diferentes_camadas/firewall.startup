@@ -1,0 +1,28 @@
+ip address add 198.51.100.2/30 dev eth0
+ip address add 10.0.1.1/24 dev eth1
+ip address add 10.0.2.1/24 dev eth2
+ip address add 10.0.3.1/24 dev eth3
+
+ip route add default via 198.51.100.1
+
+iptables -P INPUT DROP
+iptables -P OUTPUT DROP
+iptables -P FORWARD DROP
+
+iptables -F
+iptables -X
+
+iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+iptables -A FORWARD -i eth1 -o eth0 -j ACCEPT
+iptables -A FORWARD -i eth1 -o eth2 -p icmp -j ACCEPT
+iptables -A FORWARD -i eth1 -o eth2 -d 10.0.2.10 -p tcp --dport 80 -j ACCEPT
+iptables -A FORWARD -i eth1 -o eth2 -d 10.0.2.10 -p tcp --dport 443 -j ACCEPT
+iptables -A FORWARD -i eth1 -o eth2 -d 10.0.2.11 -p udp --dport 53 -j ACCEPT
+iptables -A FORWARD -i eth1 -o eth2 -d 10.0.2.11 -p tcp --dport 53 -j ACCEPT
+
+iptables -A FORWARD -i eth0 -o eth2 -p icmp -j ACCEPT
+iptables -A FORWARD -i eth0 -o eth2 -d 10.0.2.10 -p tcp --dport 80 -j ACCEPT
+iptables -A FORWARD -i eth0 -o eth2 -d 10.0.2.10 -p tcp --dport 443 -j ACCEPT
+iptables -A FORWARD -i eth0 -o eth2 -d 10.0.2.11 -p udp --dport 53 -j ACCEPT
+iptables -A FORWARD -i eth0 -o eth2 -d 10.0.2.11 -p tcp --dport 53 -j ACCEPT

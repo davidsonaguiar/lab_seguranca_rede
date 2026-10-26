@@ -1,0 +1,15 @@
+ip address add 10.0.2.10/24 dev eth0
+
+ip route add default via 10.0.2.1
+
+
+mkdir -p /var/www/html
+cat <<EOF > /var/www/html/index.html
+<!DOCTYPE html>
+<html>
+<head><title>DMZ Portal</title></head>
+<body><h1>DMZ Web Server Operacional</h1></body>
+</html>
+EOF
+
+python3 -m http.server 80 --directory /var/www/html &

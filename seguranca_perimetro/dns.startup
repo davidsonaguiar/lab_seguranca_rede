@@ -1,0 +1,7 @@
+ip address add 10.0.2.11/24 dev eth0
+
+ip route add default via 10.0.2.1
+
+echo "10.0.2.10 portal.dmz" >> /etc/hosts
+
+dnsmasq --no-daemon &
